@@ -15,7 +15,7 @@ svg{width:100%;height:auto;display:block;touch-action:manipulation;-webkit-tap-h
 </style></head><body>
 <h1>Mafate – Planificateur d’itinéraires</h1>
 <div class="card"><svg id="map" viewBox="0 0 100 142" role="img" aria-label="Carte schématique de Mafate"></svg>
-<small>Positions et tracés d’après la carte Lonely Planet (schématique, pas à l’échelle). ■ entrée du cirque · ● îlet avec gîte · ○ passage.<br><b>Dans « Construire » :</b> touche la carte. 1er point = départ, points suivants = passage, dernier point = arrivée du jour (retouche un point pour l’enlever). Deux points éloignés suffisent pour voir les itinéraires possibles.</small></div>
+<small>Positions et tracés d’après la carte Lonely Planet (schématique, pas à l’échelle). ■ entrée du cirque · ● îlet avec gîte · ○ passage.<br><b>Dans « Construire » :</b> touche la carte. 1er point = départ, points suivants = passage, dernier point = arrivée du jour (retouche un point pour l’enlever). Deux points éloignés suffisent pour voir les itinéraires possibles.<br>🚰 = robinet : net = signalé par des randonneurs, pâle = probable aux gîtes, à vérifier (l’eau n’est pas toujours potable : demande au gîte).</small></div>
 <div class="card" id="refine"><div class="g" style="margin-top:0"><div><label>Passer par</label><select id="vs"></select><div id="vc"></div></div><div><label>Éviter</label><select id="as"></select><div id="ac"></div></div></div></div>
 <div id="outA"></div>
 
@@ -54,6 +54,7 @@ $("s").innerHTML=opts("");$("s2").innerHTML=opts();$("e").innerHTML=opts("");$("
 $("vs").innerHTML=$("as").innerHTML='<option value="">+ Ajouter…</option>'+opts();
 $("s").value="";$("e").value="";$("s2").value="cdb";$("e2").value="*";
 
+const WATER=["rp","ln"];
 const RIM=[[19,9],[35,10],[62,20],[82,32],[96,30],[94,55],[90,76],[88,92],[92,105],[86,125],[76,140],[62,140],[46,132],[32,118],[20,106],[12,92],[9,72],[8,50],[10,30],[14,14]];
 const REL=(()=>{const c=[52,75];let s=`<rect x="0" y="0" width="100" height="142" fill="var(--hi)" fill-opacity=".05"/>`;
 [[1,"#b98a5a"],[.85,"#d2b86a"],[.7,"#bcd37a"],[.55,"#8fc47a"],[.4,"#6fb58a"]].forEach(([f,o])=>{s+=`<polygon points="${RIM.map(p=>(c[0]+(p[0]-c[0])*f).toFixed(1)+","+(c[1]+(p[1]-c[1])*f).toFixed(1)).join(" ")}" fill="${o}" fill-opacity=".32" stroke="var(--ln)" stroke-width=".4"/>`});
@@ -65,6 +66,7 @@ const dr=(a,c)=>{if(a)a.forEach(e=>{s+=`<polyline points="${PL(e.a,e.to,e.v)}" f
 let dep,arr,vv=[];if(tab=="B"){dep=$("s2").value;arr=$("e2").value}else{dep=curNode();arr=$("e").value;vv=via}
 for(const k in N){const v=N[k],c=k==dep?"var(--ac)":k==arr?"var(--hi)":vv.includes(k)?"#3b82f6":"var(--fg)";
 s+=`<g onclick="tap('${k}')" style="cursor:pointer"><circle cx="${v[1]}" cy="${v[2]}" r="4.5" fill="transparent"/>`+(v[4]?`<rect x="${v[1]-2.2}" y="${v[2]-2.2}" width="4.4" height="4.4" fill="${c}"/>`:`<circle cx="${v[1]}" cy="${v[2]}" r="2.4" fill="${v[3]?c:"none"}" stroke="${c}" stroke-width="1"/>`)+(an=>`<text x="${v[1]+(an=="end"?-3.5:an=="start"?3.5:0)}" y="${v[2]+(an=="middle"?-3.6:1.2)}" text-anchor="${an}" font-size="3.2" fill="var(--fg)">${v[0]}</text></g>`)(v[5]||(v[1]>72?"end":"middle"))}
+for(const k in N)if(N[k][3])s+=`<text x="${N[k][1]+2}" y="${N[k][2]-1.6}" font-size="3.4" opacity="${WATER.includes(k)?1:.4}" style="pointer-events:none">🚰</text>`;
 $("map").innerHTML=s}
 function tap(k){tab="A";
 const first=!plan.length,i=tp.indexOf(k);i>=0?tp.splice(i,1):tp.push(k);if(first)$("s").value=tp.length?tp[0]:"";
